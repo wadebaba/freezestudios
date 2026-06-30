@@ -1,0 +1,362 @@
+/* ===========================================================
+   FREEZEMC — Page-specific styles
+   =========================================================== */
+
+/* ---------- Kurallar (Rules) ---------- */
+
+.rules-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.rules-toc {
+  position: sticky;
+  top: 100px;
+  border-left: 1px solid var(--border);
+  padding-left: 20px;
+}
+
+.rules-toc .toc-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--steel-dim);
+  margin-bottom: 14px;
+}
+
+.rules-toc a {
+  display: block;
+  font-size: 14px;
+  color: var(--steel);
+  padding: 7px 0;
+  transition: color 0.15s ease;
+}
+
+.rules-toc a:hover { color: var(--ice); }
+
+.rule-block {
+  margin-bottom: 52px;
+  scroll-margin-top: 100px;
+}
+
+.rule-block .rnum {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ice-dim);
+  letter-spacing: 0.1em;
+}
+
+.rule-block h2 {
+  margin-top: 6px;
+  margin-bottom: 18px;
+  font-size: 26px;
+}
+
+.rule-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.rule-item:first-of-type { border-top: 1px solid var(--border); }
+
+.rule-item .rcode {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ice);
+  flex-shrink: 0;
+  width: 46px;
+}
+
+.rule-item .rtext h4 {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--frost);
+  margin-bottom: 4px;
+}
+
+.rule-item .rtext p { font-size: 14px; }
+
+.penalty-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin-top: 8px;
+}
+
+.penalty-low { background: rgba(224, 179, 85, 0.1); color: var(--gold); border: 1px solid rgba(224, 179, 85, 0.25); }
+.penalty-high { background: rgba(240, 85, 61, 0.1); color: var(--danger); border: 1px solid rgba(240, 85, 61, 0.25); }
+
+@media (max-width: 860px) {
+  .rules-layout { grid-template-columns: 1fr; }
+  .rules-toc { position: static; border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 20px; }
+}
+
+/* ---------- Mağaza (Store) ---------- */
+
+.store-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.store-tab {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 9px 18px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  color: var(--steel);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.store-tab:hover { color: var(--frost); border-color: var(--steel); }
+.store-tab.active { background: var(--ice); color: #061119; border-color: var(--ice); }
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.product-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.product-card:hover { border-color: var(--ice-dim); transform: translateY(-3px); }
+
+.product-card.featured { border-color: var(--gold); }
+
+.product-card .ribbon {
+  position: absolute;
+  top: 14px; right: -1px;
+  background: var(--gold);
+  color: #2b1d05;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  letter-spacing: 0.05em;
+}
+
+.product-head {
+  padding: 26px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.product-head .ptier {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ice);
+  margin-bottom: 8px;
+}
+
+.product-head .pname {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--frost);
+}
+
+.product-head .pprice {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--frost);
+}
+
+.product-head .pprice span {
+  font-size: 14px;
+  color: var(--steel-dim);
+  font-weight: 400;
+}
+
+.product-perks {
+  padding: 20px 24px;
+  flex: 1;
+}
+
+.product-perks li {
+  display: flex;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--steel);
+  padding: 6px 0;
+}
+
+.product-perks li .check { color: var(--ice); flex-shrink: 0; }
+
+.product-card .pbuy { margin: 0 24px 24px; }
+
+@media (max-width: 860px) {
+  .product-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .product-grid { grid-template-columns: 1fr; }
+}
+
+.store-note {
+  margin-top: 56px;
+  padding: 22px 26px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--ice);
+  background: rgba(61, 217, 240, 0.04);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.store-note p { font-size: 14px; color: var(--steel); }
+
+/* ---------- Forum ---------- */
+
+.forum-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.forum-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 16px;
+  flex: 1;
+  max-width: 360px;
+}
+
+.forum-search input {
+  background: none;
+  border: none;
+  color: var(--frost);
+  font-family: var(--font-body);
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.forum-search input::placeholder { color: var(--steel-dim); }
+.forum-search svg { color: var(--steel-dim); flex-shrink: 0; }
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-bottom: 60px;
+}
+
+.category-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: border-color 0.2s ease;
+}
+
+.category-card:hover { border-color: var(--ice-dim); }
+
+.category-card .cicon {
+  width: 44px; height: 44px;
+  border-radius: var(--radius);
+  background: rgba(61, 217, 240, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ice);
+  flex-shrink: 0;
+}
+
+.category-card .cname { font-family: var(--font-body); font-weight: 700; font-size: 15px; color: var(--frost); }
+.category-card .cdesc { font-size: 13px; margin-top: 3px; }
+.category-card .ccount {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--steel-dim);
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+@media (max-width: 700px) {
+  .category-grid { grid-template-columns: 1fr; }
+}
+
+.thread-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.thread-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 18px;
+  align-items: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  transition: background 0.15s ease;
+}
+
+.thread-row:last-child { border-bottom: none; }
+.thread-row:hover { background: var(--panel-2); }
+
+.thread-tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.tag-pinned { background: rgba(224, 179, 85, 0.12); color: var(--gold); }
+.tag-duyuru { background: rgba(61, 217, 240, 0.12); color: var(--ice); }
+.tag-genel { background: rgba(107, 140, 174, 0.15); color: var(--steel); }
+.tag-pvp { background: rgba(240, 85, 61, 0.12); color: var(--danger); }
+
+.thread-title { font-size: 14.5px; color: var(--frost); font-weight: 500; }
+.thread-meta { font-family: var(--font-mono); font-size: 12px; color: var(--steel-dim); }
+.thread-replies {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--steel);
+  text-align: right;
+  white-space: nowrap;
+}
+.thread-replies span { color: var(--steel-dim); font-size: 11px; display: block; }
+
+@media (max-width: 700px) {
+  .thread-row { grid-template-columns: 1fr; gap: 6px; }
+  .thread-replies { text-align: left; }
+}

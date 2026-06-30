@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — FreezeMC</title>
+<link rel="stylesheet" href="/css/main.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <a href="/" class="logo" style="margin-bottom: 36px;">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 2L16 30M16 2L9 7M16 2L23 7M16 30L9 25M16 30L23 25M4 11L28 21M4 11L4 18M4 11L10 9M28 21L28 14M28 21L22 23M4 18L10 23M28 14L22 9" stroke="#3DD9F0" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="3" fill="#3DD9F0"/>
+      </svg>
+      FREEZE<span class="accent">MC</span>
+    </a>
+
+    <nav class="admin-nav">
+      <a href="#tab-site" class="admin-nav-link active" data-tab="tab-site">Site İçeriği</a>
+      <a href="#tab-store" class="admin-nav-link" data-tab="tab-store">Mağaza</a>
+      <a href="#tab-rules" class="admin-nav-link" data-tab="tab-rules">Kurallar</a>
+      <a href="#tab-forum" class="admin-nav-link" data-tab="tab-forum">Forum</a>
+    </nav>
+
+    <div class="admin-sidebar-bottom">
+      <a href="/" target="_blank" class="btn btn-ghost btn-sm btn-full" style="margin-bottom:10px;">Siteyi Görüntüle ↗</a>
+      <form method="POST" action="/admin/logout">
+        <button type="submit" class="btn btn-ghost btn-sm btn-full">Çıkış Yap</button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div id="toast" class="toast"></div>
+
+    <!-- ============ SITE TAB ============ -->
+    <section id="tab-site" class="admin-tab active">
+      <div class="admin-header">
+        <h2>Site İçeriği</h2>
+        <p>Sunucu IP'si, hero metni, istatistikler, bölgeler ve özellik kartları.</p>
+      </div>
+
+      <form id="form-site" class="admin-form">
+        <div class="admin-card">
+          <h3>Genel</h3>
+          <div class="grid-2">
+            <div class="field">
+              <label>Sunucu IP</label>
+              <input type="text" name="serverIp" value="<%= db.site.serverIp %>">
+            </div>
+            <div class="field">
+              <label>Sürüm Etiketi</label>
+              <input type="text" name="serverVersion" value="<%= db.site.serverVersion %>">
+            </div>
+            <div class="field">
+              <label>Sunucu Türü Etiketi</label>
+              <input type="text" name="serverType" value="<%= db.site.serverType %>">
+            </div>
+            <div class="field">
+              <label>Hero Üstü Etiket</label>
+              <input type="text" name="heroTag" value="<%= db.site.heroTag %>">
+            </div>
+          </div>
+          <div class="field">
+            <label>Hero Açıklama Metni</label>
+            <textarea name="heroSubtitle" rows="3"><%= db.site.heroSubtitle %></textarea>
+          </div>
+          <div class="grid-3">
+            <div class="field">
+              <label>Discord URL</label>
+              <input type="text" name="discordUrl" value="<%= db.site.discordUrl %>">
+            </div>
+            <div class="field">
+              <label>YouTube URL</label>
+              <input type="text" name="youtubeUrl" value="<%= db.site.youtubeUrl %>">
+            </div>
+            <div class="field">
+              <label>Twitter / X URL</label>
+              <input type="text" name="twitterUrl" value="<%= db.site.twitterUrl %>">
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <h3>İstatistik Şeridi</h3>
+          <div id="stats-list" class="repeat-list">
+            <% db.site.stats.forEach(function(s, i) { %>
+              <div class="repeat-row" data-index="<%= i %>">
+                <input type="text" name="stats[<%= i %>][num]" value="<%= s.num %>" placeholder="240+" class="w-sm">
+                <input type="text" name="stats[<%= i %>][label]" value="<%= s.label %>" placeholder="AKTİF OYUNCU">
+                <button type="button" class="btn-icon-del" onclick="removeRow(this)">✕</button>
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addStatRow()">+ İstatistik Ekle</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>Bölgeler (Faction Grid)</h3>
+          <div id="regions-list" class="repeat-block-list">
+            <% db.site.regions.forEach(function(r, i) { %>
+              <div class="repeat-block" data-index="<%= i %>">
+                <div class="repeat-block-head">
+                  <span>Bölge <%= i + 1 %></span>
+                  <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                </div>
+                <div class="grid-3">
+                  <input type="text" name="regions[<%= i %>][tag]" value="<%= r.tag %>" placeholder="BÖLGE 01">
+                  <input type="text" name="regions[<%= i %>][name]" value="<%= r.name %>" placeholder="Safe Zone">
+                  <input type="text" name="regions[<%= i %>][pvp]" value="<%= r.pvp %>" placeholder="PvP: Açık/Kapalı">
+                </div>
+                <input type="text" name="regions[<%= i %>][claim]" value="<%= r.claim %>" placeholder="Claim: Açık/Yok" style="margin-top:10px;">
+                <textarea name="regions[<%= i %>][desc]" rows="2" style="margin-top:10px;"><%= r.desc %></textarea>
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addRegionBlock()">+ Bölge Ekle</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>Özellik Kartları</h3>
+          <div id="features-list" class="repeat-block-list">
+            <% db.site.features.forEach(function(f, i) { %>
+              <div class="repeat-block" data-index="<%= i %>">
+                <div class="repeat-block-head">
+                  <span><%= f.title %></span>
+                  <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                </div>
+                <div class="grid-2">
+                  <input type="text" name="features[<%= i %>][title]" value="<%= f.title %>" placeholder="Başlık">
+                  <select name="features[<%= i %>][icon]">
+                    <% ['layers','shield','trending','star','lock','clock'].forEach(function(ic) { %>
+                      <option value="<%= ic %>" <%= f.icon === ic ? 'selected' : '' %>><%= ic %></option>
+                    <% }) %>
+                  </select>
+                </div>
+                <textarea name="features[<%= i %>][desc]" rows="2" style="margin-top:10px;"><%= f.desc %></textarea>
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addFeatureBlock()">+ Özellik Ekle</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary admin-save">Site İçeriğini Kaydet</button>
+      </form>
+    </section>
+
+    <!-- ============ STORE TAB ============ -->
+    <section id="tab-store" class="admin-tab">
+      <div class="admin-header">
+        <h2>Mağaza</h2>
+        <p>Rütbe/ürün ekle, fiyat ve özellik listesini düzenle.</p>
+      </div>
+
+      <form id="form-store" class="admin-form">
+        <div class="admin-card">
+          <h3>Adil Oyun Notu</h3>
+          <textarea name="note" rows="2"><%= db.store.note %></textarea>
+        </div>
+
+        <div class="admin-card">
+          <h3>Ürünler</h3>
+          <div id="products-list" class="repeat-block-list">
+            <% db.store.products.forEach(function(p, i) { %>
+              <div class="repeat-block" data-index="<%= i %>">
+                <div class="repeat-block-head">
+                  <span><%= p.name %></span>
+                  <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                </div>
+                <div class="grid-3">
+                  <input type="text" name="products[<%= i %>][tier]" value="<%= p.tier %>" placeholder="Rütbe">
+                  <input type="text" name="products[<%= i %>][name]" value="<%= p.name %>" placeholder="İsim">
+                  <input type="text" name="products[<%= i %>][price]" value="<%= p.price %>" placeholder="₺149">
+                </div>
+                <div class="grid-3" style="margin-top:10px;">
+                  <input type="text" name="products[<%= i %>][priceNote]" value="<%= p.priceNote %>" placeholder="/tek seferlik">
+                  <input type="text" name="products[<%= i %>][ribbon]" value="<%= p.ribbon || '' %>" placeholder="Etiket (örn: En Popüler)">
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="products[<%= i %>][featured]" <%= p.featured ? 'checked' : '' %>>
+                    Öne çıkan ürün
+                  </label>
+                </div>
+                <label style="display:block; margin-top:12px; font-size:13px; color:var(--steel); font-weight:600;">Özellikler (her satıra bir özellik)</label>
+                <textarea name="products[<%= i %>][perksRaw]" rows="4" style="margin-top:6px;"><%= p.perks.join('\n') %></textarea>
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addProductBlock()">+ Ürün Ekle</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary admin-save">Mağazayı Kaydet</button>
+      </form>
+    </section>
+
+    <!-- ============ RULES TAB ============ -->
+    <section id="tab-rules" class="admin-tab">
+      <div class="admin-header">
+        <h2>Kurallar</h2>
+        <p>Kural bölümlerini ve maddelerini düzenle.</p>
+      </div>
+
+      <form id="form-rules" class="admin-form">
+        <div id="rule-sections-list">
+          <% db.rules.sections.forEach(function(sec, si) { %>
+            <div class="admin-card rule-section-block" data-sindex="<%= si %>">
+              <div class="repeat-block-head">
+                <span>Bölüm <%= sec.num %> — <%= sec.title %></span>
+                <button type="button" class="btn-icon-del" onclick="removeSectionBlock(this)">✕ Bölümü Sil</button>
+              </div>
+              <div class="grid-3">
+                <input type="text" name="sections[<%= si %>][num]" value="<%= sec.num %>" placeholder="01">
+                <input type="text" name="sections[<%= si %>][id]" value="<%= sec.id %>" placeholder="genel">
+                <input type="text" name="sections[<%= si %>][title]" value="<%= sec.title %>" placeholder="Genel Davranış">
+              </div>
+
+              <div class="rule-items-list" style="margin-top:16px;">
+                <% sec.items.forEach(function(item, ii) { %>
+                  <div class="repeat-block rule-item-block">
+                    <div class="repeat-block-head">
+                      <span>Madde <%= item.code %></span>
+                      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                    </div>
+                    <div class="grid-3">
+                      <input type="text" name="sections[<%= si %>][items][<%= ii %>][code]" value="<%= item.code %>" placeholder="1.1">
+                      <input type="text" name="sections[<%= si %>][items][<%= ii %>][title]" value="<%= item.title %>" placeholder="Başlık">
+                      <select name="sections[<%= si %>][items][<%= ii %>][penaltyLevel]">
+                        <option value="" <%= !item.penaltyLevel ? 'selected' : '' %>>Ceza yok</option>
+                        <option value="low" <%= item.penaltyLevel === 'low' ? 'selected' : '' %>>Düşük (sarı)</option>
+                        <option value="high" <%= item.penaltyLevel === 'high' ? 'selected' : '' %>>Ağır (kırmızı)</option>
+                      </select>
+                    </div>
+                    <textarea name="sections[<%= si %>][items][<%= ii %>][desc]" rows="2" style="margin-top:10px;"><%= item.desc %></textarea>
+                    <input type="text" name="sections[<%= si %>][items][<%= ii %>][penalty]" value="<%= item.penalty %>" placeholder="Ceza metni (örn: Kalıcı ban)" style="margin-top:10px;">
+                  </div>
+                <% }) %>
+              </div>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="addRuleItem(this)" style="margin-top:10px;">+ Madde Ekle</button>
+            </div>
+          <% }) %>
+        </div>
+        <button type="button" class="btn btn-ghost" onclick="addRuleSection()">+ Yeni Bölüm Ekle</button>
+        <button type="submit" class="btn btn-primary admin-save">Kuralları Kaydet</button>
+      </form>
+    </section>
+
+    <!-- ============ FORUM TAB ============ -->
+    <section id="tab-forum" class="admin-tab">
+      <div class="admin-header">
+        <h2>Forum</h2>
+        <p>Forum kategorilerini ve son konuları düzenle.</p>
+      </div>
+
+      <form id="form-forum" class="admin-form">
+        <div class="admin-card">
+          <h3>Kategoriler</h3>
+          <div id="categories-list" class="repeat-block-list">
+            <% db.forum.categories.forEach(function(c, i) { %>
+              <div class="repeat-block" data-index="<%= i %>">
+                <div class="repeat-block-head">
+                  <span><%= c.name %></span>
+                  <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                </div>
+                <div class="grid-3">
+                  <input type="text" name="categories[<%= i %>][name]" value="<%= c.name %>" placeholder="İsim">
+                  <select name="categories[<%= i %>][icon]">
+                    <% ['announce','chat','star','support'].forEach(function(ic) { %>
+                      <option value="<%= ic %>" <%= c.icon === ic ? 'selected' : '' %>><%= ic %></option>
+                    <% }) %>
+                  </select>
+                  <input type="text" name="categories[<%= i %>][count]" value="<%= c.count %>" placeholder="128">
+                </div>
+                <input type="text" name="categories[<%= i %>][desc]" value="<%= c.desc %>" placeholder="Açıklama" style="margin-top:10px;">
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addCategoryBlock()">+ Kategori Ekle</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>Konular</h3>
+          <div id="threads-list" class="repeat-block-list">
+            <% db.forum.threads.forEach(function(t, i) { %>
+              <div class="repeat-block" data-index="<%= i %>">
+                <div class="repeat-block-head">
+                  <span><%= t.title %></span>
+                  <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+                </div>
+                <input type="hidden" name="threads[<%= i %>][id]" value="<%= t.id %>">
+                <input type="text" name="threads[<%= i %>][title]" value="<%= t.title %>" placeholder="Konu başlığı">
+                <div class="grid-3" style="margin-top:10px;">
+                  <select name="threads[<%= i %>][tag]">
+                    <% ['pinned','duyuru','pvp','genel'].forEach(function(tg) { %>
+                      <option value="<%= tg %>" <%= t.tag === tg ? 'selected' : '' %>><%= tg %></option>
+                    <% }) %>
+                  </select>
+                  <input type="text" name="threads[<%= i %>][tagLabel]" value="<%= t.tagLabel %>" placeholder="Etiket metni">
+                  <input type="number" name="threads[<%= i %>][replies]" value="<%= t.replies %>" placeholder="Yanıt sayısı">
+                </div>
+                <div class="grid-2" style="margin-top:10px;">
+                  <input type="text" name="threads[<%= i %>][author]" value="<%= t.author %>" placeholder="Yazar">
+                  <input type="text" name="threads[<%= i %>][time]" value="<%= t.time %>" placeholder="2 gün önce">
+                </div>
+              </div>
+            <% }) %>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addThreadBlock()">+ Konu Ekle</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary admin-save">Forumu Kaydet</button>
+      </form>
+    </section>
+
+  </main>
+</div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>

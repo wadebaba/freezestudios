@@ -1,0 +1,276 @@
+// FreezeMC Admin Panel — tab switching, dynamic rows, form submission
+
+// ---------- Tab switching ----------
+document.querySelectorAll(".admin-nav-link").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    const tabId = link.dataset.tab;
+    document.querySelectorAll(".admin-nav-link").forEach(l => l.classList.remove("active"));
+    document.querySelectorAll(".admin-tab").forEach(t => t.classList.remove("active"));
+    link.classList.add("active");
+    document.getElementById(tabId).classList.add("active");
+    history.replaceState(null, "", "#" + tabId);
+  });
+});
+
+// Restore tab from hash on load
+window.addEventListener("DOMContentLoaded", () => {
+  const hash = window.location.hash.replace("#", "");
+  if (hash) {
+    const link = document.querySelector(`.admin-nav-link[data-tab="${hash}"]`);
+    if (link) link.click();
+  }
+});
+
+// ---------- Toast ----------
+function showToast(message, isError) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => { toast.className = "toast"; }, 2600);
+}
+
+// ---------- Generic row/block removal ----------
+function removeRow(btn) {
+  btn.closest(".repeat-row").remove();
+}
+
+function removeBlock(btn) {
+  btn.closest(".repeat-block").remove();
+}
+
+function removeSectionBlock(btn) {
+  if (confirm("Bu bölümü ve içindeki tüm maddeleri silmek istediğine emin misin?")) {
+    btn.closest(".rule-section-block").remove();
+  }
+}
+
+// ---------- Add: Stats ----------
+function addStatRow() {
+  const list = document.getElementById("stats-list");
+  const i = list.querySelectorAll(".repeat-row").length;
+  const row = document.createElement("div");
+  row.className = "repeat-row";
+  row.innerHTML = `
+    <input type="text" name="stats[${i}][num]" placeholder="240+" class="w-sm">
+    <input type="text" name="stats[${i}][label]" placeholder="AKTİF OYUNCU">
+    <button type="button" class="btn-icon-del" onclick="removeRow(this)">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+// ---------- Add: Regions ----------
+function addRegionBlock() {
+  const list = document.getElementById("regions-list");
+  const i = list.querySelectorAll(".repeat-block").length;
+  const block = document.createElement("div");
+  block.className = "repeat-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Bölge</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <div class="grid-3">
+      <input type="text" name="regions[${i}][tag]" placeholder="BÖLGE 04">
+      <input type="text" name="regions[${i}][name]" placeholder="İsim">
+      <input type="text" name="regions[${i}][pvp]" placeholder="PvP: Açık/Kapalı">
+    </div>
+    <input type="text" name="regions[${i}][claim]" placeholder="Claim: Açık/Yok" style="margin-top:10px;">
+    <textarea name="regions[${i}][desc]" rows="2" style="margin-top:10px;" placeholder="Açıklama"></textarea>
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Add: Features ----------
+function addFeatureBlock() {
+  const list = document.getElementById("features-list");
+  const i = list.querySelectorAll(".repeat-block").length;
+  const icons = ["layers", "shield", "trending", "star", "lock", "clock"];
+  const options = icons.map(ic => `<option value="${ic}">${ic}</option>`).join("");
+  const block = document.createElement("div");
+  block.className = "repeat-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Özellik</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <div class="grid-2">
+      <input type="text" name="features[${i}][title]" placeholder="Başlık">
+      <select name="features[${i}][icon]">${options}</select>
+    </div>
+    <textarea name="features[${i}][desc]" rows="2" style="margin-top:10px;" placeholder="Açıklama"></textarea>
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Add: Products ----------
+function addProductBlock() {
+  const list = document.getElementById("products-list");
+  const i = list.querySelectorAll(".repeat-block").length;
+  const block = document.createElement("div");
+  block.className = "repeat-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Ürün</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <div class="grid-3">
+      <input type="text" name="products[${i}][tier]" placeholder="Rütbe">
+      <input type="text" name="products[${i}][name]" placeholder="İsim">
+      <input type="text" name="products[${i}][price]" placeholder="₺149">
+    </div>
+    <div class="grid-3" style="margin-top:10px;">
+      <input type="text" name="products[${i}][priceNote]" placeholder="/tek seferlik">
+      <input type="text" name="products[${i}][ribbon]" placeholder="Etiket (örn: En Popüler)">
+      <label class="checkbox-label">
+        <input type="checkbox" name="products[${i}][featured]">
+        Öne çıkan ürün
+      </label>
+    </div>
+    <label style="display:block; margin-top:12px; font-size:13px; color:var(--steel); font-weight:600;">Özellikler (her satıra bir özellik)</label>
+    <textarea name="products[${i}][perksRaw]" rows="4" style="margin-top:6px;" placeholder="Özel /nick komutu&#10;2 ekstra ev"></textarea>
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Add: Rule section ----------
+function addRuleSection() {
+  const list = document.getElementById("rule-sections-list");
+  const si = list.querySelectorAll(".rule-section-block").length;
+  const block = document.createElement("div");
+  block.className = "admin-card rule-section-block";
+  block.dataset.sindex = si;
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Bölüm</span>
+      <button type="button" class="btn-icon-del" onclick="removeSectionBlock(this)">✕ Bölümü Sil</button>
+    </div>
+    <div class="grid-3">
+      <input type="text" name="sections[${si}][num]" placeholder="06">
+      <input type="text" name="sections[${si}][id]" placeholder="yeni-bolum">
+      <input type="text" name="sections[${si}][title]" placeholder="Bölüm Başlığı">
+    </div>
+    <div class="rule-items-list" style="margin-top:16px;"></div>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="addRuleItem(this)" style="margin-top:10px;">+ Madde Ekle</button>
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Add: Rule item within a section ----------
+function addRuleItem(btn) {
+  const sectionBlock = btn.closest(".rule-section-block");
+  const si = sectionBlock.dataset.sindex;
+  const itemsList = sectionBlock.querySelector(".rule-items-list");
+  const ii = itemsList.querySelectorAll(".rule-item-block").length;
+  const block = document.createElement("div");
+  block.className = "repeat-block rule-item-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Madde</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <div class="grid-3">
+      <input type="text" name="sections[${si}][items][${ii}][code]" placeholder="6.1">
+      <input type="text" name="sections[${si}][items][${ii}][title]" placeholder="Başlık">
+      <select name="sections[${si}][items][${ii}][penaltyLevel]">
+        <option value="">Ceza yok</option>
+        <option value="low">Düşük (sarı)</option>
+        <option value="high">Ağır (kırmızı)</option>
+      </select>
+    </div>
+    <textarea name="sections[${si}][items][${ii}][desc]" rows="2" style="margin-top:10px;" placeholder="Açıklama"></textarea>
+    <input type="text" name="sections[${si}][items][${ii}][penalty]" placeholder="Ceza metni (örn: Kalıcı ban)" style="margin-top:10px;">
+  `;
+  itemsList.appendChild(block);
+}
+
+// ---------- Add: Forum category ----------
+function addCategoryBlock() {
+  const list = document.getElementById("categories-list");
+  const i = list.querySelectorAll(".repeat-block").length;
+  const icons = ["announce", "chat", "star", "support"];
+  const options = icons.map(ic => `<option value="${ic}">${ic}</option>`).join("");
+  const block = document.createElement("div");
+  block.className = "repeat-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Kategori</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <div class="grid-3">
+      <input type="text" name="categories[${i}][name]" placeholder="İsim">
+      <select name="categories[${i}][icon]">${options}</select>
+      <input type="text" name="categories[${i}][count]" placeholder="0">
+    </div>
+    <input type="text" name="categories[${i}][desc]" placeholder="Açıklama" style="margin-top:10px;">
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Add: Forum thread ----------
+function addThreadBlock() {
+  const list = document.getElementById("threads-list");
+  const i = list.querySelectorAll(".repeat-block").length;
+  const block = document.createElement("div");
+  block.className = "repeat-block";
+  block.innerHTML = `
+    <div class="repeat-block-head">
+      <span>Yeni Konu</span>
+      <button type="button" class="btn-icon-del" onclick="removeBlock(this)">✕</button>
+    </div>
+    <input type="hidden" name="threads[${i}][id]" value="${Date.now()}">
+    <input type="text" name="threads[${i}][title]" placeholder="Konu başlığı">
+    <div class="grid-3" style="margin-top:10px;">
+      <select name="threads[${i}][tag]">
+        <option value="pinned">pinned</option>
+        <option value="duyuru">duyuru</option>
+        <option value="pvp">pvp</option>
+        <option value="genel" selected>genel</option>
+      </select>
+      <input type="text" name="threads[${i}][tagLabel]" placeholder="Etiket metni" value="Genel">
+      <input type="number" name="threads[${i}][replies]" placeholder="0" value="0">
+    </div>
+    <div class="grid-2" style="margin-top:10px;">
+      <input type="text" name="threads[${i}][author]" placeholder="Yazar">
+      <input type="text" name="threads[${i}][time]" placeholder="şimdi">
+    </div>
+  `;
+  list.appendChild(block);
+}
+
+// ---------- Form submission (AJAX) ----------
+function setupFormSubmit(formId, endpoint) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Kaydediliyor...";
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast("Kaydedildi ✓ Site güncellendi.");
+      } else {
+        showToast(data.message || "Kaydedilirken bir hata oluştu.", true);
+      }
+    } catch (err) {
+      showToast("Sunucuya bağlanılamadı.", true);
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+}
+
+setupFormSubmit("form-site", "/admin/api/site");
+setupFormSubmit("form-store", "/admin/api/store");
+setupFormSubmit("form-rules", "/admin/api/rules");
+setupFormSubmit("form-forum", "/admin/api/forum");

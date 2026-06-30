@@ -1,0 +1,27 @@
+// FreezeMC — shared site behavior
+
+function copyServerIP(btn) {
+  const ip = "play.freezemc.net";
+  navigator.clipboard.writeText(ip).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = "Kopyalandı ✓";
+    setTimeout(() => { btn.innerHTML = original; }, 1800);
+  }).catch(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = "Kopyalanamadı";
+    setTimeout(() => { btn.innerHTML = original; }, 1800);
+  });
+}
+
+function toggleNav() {
+  document.querySelector(".nav-links").classList.toggle("open");
+}
+
+// Close mobile nav when a link is clicked
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".nav-links a").forEach(link => {
+    link.addEventListener("click", () => {
+      document.querySelector(".nav-links").classList.remove("open");
+    });
+  });
+});
